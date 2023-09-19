@@ -57,38 +57,6 @@ fi
 
 ##### Download and install BWA-mem2 ######
 
-echo "Downloading and installing BWA-mem2"
-if [[ ! -s $bindir/bwa ]]; then
-
-    if [[ ! -d $projdir/src/bwa ]]; then
-	cd $projdir/src/
-	git clone https://github.com/lh3/bwa.git &> $projdir/src/log/bwa_cloning.log
-    fi
-
-    if [[ ! -s $projdir/src/bwa/bwa ]]; then
-	cd $projdir/src/bwa
-	make &> $projdir/src/log/bwa_installation.log
-    fi
-
-    cp bwa $bindir
-fi
-
-if  [[ ! -s $bindir/bwa ]]; then
-    echo " !! Error: bwa not installed properly!"; 
-    echo "   Please check the log files:" 
-    echo "   Check if bwa was downloaded properly:" $projdir/src/log/bwa_cloning.log 
-    echo "   Check if the bwa was compiled properly:" $projdir/src/log/bwa_installation.log
-
-    # Cleaning up
-    cd $projdir/src
-    rm -rf $projdir/src/bwa/bwa $bindir/bwa 
-    
-    errs=$(($errs+1))
-else
-    echo " BWA succesfully installed!"
-    rm -rf $projdir/src/bwa/
-fi
-
 ##### Download and install minimap2 ######
 
 echo "Downloading and installing minimap2"
@@ -141,6 +109,9 @@ for src in "${srcs[@]}"; do
         errs=$(($errs+1))
     fi
 done
+
+cd $bindir
+chmod 755 samtools 
 
 if [  $errs -gt 0 ]; then echo; echo " ****  Errors occurred! **** "; echo; exit; 
 else echo " Congrats: installation successful!"; fi
