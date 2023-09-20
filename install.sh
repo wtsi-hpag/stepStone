@@ -9,53 +9,13 @@ mkdir -p $projdir/src/log/
 
 errs=0
 
-##### Download disease data file IMDB.tar.gz ######
+##### Download bwa-mem2 ######
         cd $projdir/src/
         tar xvf bwa-mem2-2.2.1_x64-linux.tar 
         mv bwa-mem2-2.2.1_x64-linux/* step-bin/ 
 
     echo " bwa-mem2 succesfully installed!"
 
-
-##### Download and install pigz ######
-
-echo "Downloading and installing pigz"
-if [[ ! -s $bindir/pigz ]]; then
-
-    if [[ ! -d $projdir/src/pigz ]]; then
-        cd $projdir/src/
-        wget -r -np -nd https://zlib.net/pigz/pigz-2.4.tar.gz &> $projdir/src/log/pigz_wget.log
-        tar -xvzf pigz-2.4.tar.gz &> $projdir/src/log/pigz_untar.log
-        rm -f pigz-2.4.tar.gz
-    fi
-
-    if [[ ! -s $projdir/src/pigz/pigz ]]; then
-        cd $projdir/src/pigz-2.4
-        make &> $projdir/src/log/pigz_installation.log
-    fi
-
-    cp pigz $bindir
-fi
-
-if  [[ ! -s $bindir/pigz ]]; then
-    echo " !! Error: pigz not installed properly!"; 
-    echo "   Please check the log files:" 
-    echo "   Check if bwa was downloaded properly:" $projdir/src/log/pigz_cloning.log 
-    echo "   Check if the bwa was compiled properly:" $projdir/src/log/pigz_installation.log
-
-    # Cleaning up
-    cd $projdir/src
-    rm -rf $projdir/src/pigz/pigz $bindir/pigz 
-    
-    errs=$(($errs+1))
-else
-    echo " pigz succesfully installed!"
-    rm -rf $projdir/src/pigz/
-fi
-
-
-
-##### Download and install BWA-mem2 ######
 
 ##### Download and install minimap2 ######
 
@@ -112,6 +72,7 @@ done
 
 cd $bindir
 chmod 755 samtools 
+chmod 755 pigz 
 
 if [  $errs -gt 0 ]; then echo; echo " ****  Errors occurred! **** "; echo; exit; 
 else echo " Congrats: installation successful!"; fi
