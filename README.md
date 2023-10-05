@@ -43,7 +43,7 @@ Commands:                                               \
 		-data     ont     - Oxford Nanopore Q20 or Q30                                                                      \
 		-data     ont-NLR - Oxford Nanopore normal long reads (NLR)                                                         \
 		-data     ngs-HiC - Hi-C reads                                                                                      \
-      		-data     ngs-10X - 10X reads                                                                                       \
+		-data     ngs-10X - 10X reads                                                                                      \
 		-data     ngs-SSR - Standard short reads such as Illumina data                                                      \
 
 ### Breakpoint Detection
@@ -57,10 +57,10 @@ Commands:                                               \
            $ ./stepStone breakpoint -data ngs-HiC -bam mysorted.bam <output_breakpoints.vcf>           \
            $ ./stepStone breakpoint -data ngs-10x -bam mysorted.bam <output_breakpoints.vcf>           \
            $ ./stepStone breakpoint -data ngs-SSR -bam mysorted.bam <output_breakpoints.vcf>           \
-      		-data     ccs     - PacBio Hifi                                                   \
+		-data     ccs     - PacBio HiFi                                    \
 		-data     ont     - Oxford Nanopore Q20 or Q30                                    \
 		-data     ngs-HiC - Hi-C reads                                                    \
-      		-data     ngs-10X - 10X reads                                                     \
+		-data     ngs-10X - 10X reads                                                    \
 		-data     ngs-SSR - Standard short reads such as Illumina data                    \
 	--- Note: the sam/bam/cram file has to be Name sorted! ---                                \
 	--- If not read name sorted, please do the following:  ---                                \
