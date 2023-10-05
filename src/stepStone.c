@@ -66,6 +66,7 @@ static int min_len = 3000;
 static int bam_flag = 0;
 static int data_flag = 1;
 static int platform_tag = 1;
+static int denoise_flag = 1;
 static int n_cover = 5;
 
 void
@@ -92,7 +93,7 @@ int main(int argc, char **argv)
     int m_score,n_nodes,n_debug,num_sigma;
     void Memory_Allocate(int arr);
     char tempa[2000],tempc[2000],syscmd[2000],workdir[2000],commands[2000];
-    char file_tarseq[2000],file_Stones[2000],file_snpfrq[2000],file_datas[2000],file_ctname[2000],file_ctspec[2000];
+    char file_tarseq[2000],file_Stones[2000],file_snpfrq[2000],file_datas[2000],file_bambam[2000],file_ctspec[2000];
     char file_lgread[2000],samname[500],bamname[500],toolname[500],fastname[500],datname[500];
     char file_read1[2000],file_read2[2000],fq1name[500],fq2name[500];
     char datatype[10],tagname[10],sample[50];
@@ -132,9 +133,9 @@ int main(int argc, char **argv)
          
          printf("===Align reads to a reference for all data types:\n");
          printf("	Usage: %s align -nodes 60 -data ccs/ont/ont-NLR -reads input_long.fasta/q <Input_Reference> <Output_sorted_bam>\n",argv[0]);
-         printf("	Usage: %s align -nodes 60 -data ngs-HiC -fq1 read_1.fq.gz -fg2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
-         printf("	Usage: %s align -nodes 60 -data ngs-10X -fq1 read_1.fq.gz -fg2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
-         printf("	Usage: %s align -nodes 60 -data ngs-SSR -fq1 read_1.fq.gz -fg2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
+         printf("	Usage: %s align -nodes 60 -data ngs-HiC -fq1 read_1.fq.gz -fq2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
+         printf("	Usage: %s align -nodes 60 -data ngs-10X -fq1 read_1.fq.gz -fq2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
+         printf("	Usage: %s align -nodes 60 -data ngs-SSR -fq1 read_1.fq.gz -fq2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
          printf("      	 	-nodes    60      - Number of CPUs requested\n");
          printf("      		-data     ccs     - PacBio Hifi\n");
          printf("		-data     ont     - Oxford Nanopore Q20 or Q30\n");
@@ -211,6 +212,11 @@ int main(int argc, char **argv)
          sscanf(argv[++i],"%d",&platform_tag);
          args=args+2;
        }
+       else if(!strcmp(argv[i],"-denoise"))
+       {
+         sscanf(argv[++i],"%d",&denoise_flag);
+         args=args+2;
+       }
        else if(!strcmp(argv[i],"-fasta"))
        {
          run_align = 1;
@@ -238,7 +244,7 @@ int main(int argc, char **argv)
          printf("\n");
 	 
          printf("===Detect breakpoints with aligned, and name sorted sam,bam or cram files:\n");
-         printf("	Usage: %s breakpoint -nodes 60 -data ccs/ont/ont-NLR/ngs-HiC/ngs-10X/ngs-SSR -bam /myspace/desk/test-sorted.bam <output_breakpoints.vcf>\n",argv[0]);
+         printf("	Usage: %s breakpoint -nodes 60 -data ccs/ont/ngs-HiC/ngs-10X/ngs-SSR -bam /myspace/desk/test-sorted.bam <output_breakpoints.vcf>\n",argv[0]);
          printf("	--- Note: the sam/bam/cram file has to be Name sorted! ---\n");
          printf("	--- If not read name sorted, please do the following:  ---\n");
          printf("	--- samtools sort -@ 60 -n your.bam new.bam ---\n\n");
@@ -248,14 +254,14 @@ int main(int argc, char **argv)
          printf("\n");
          
          printf("===Plot depth of coverage for all data types:\n");
-         printf("	Usage: %s plot -nodes 60 -bam /myspace/desk/test-sorted.bam -sample cancer\n",argv[0]);
+         printf("	Usage: %s plot -bam /myspace/desk/test-sorted.bam -sample cancer\n",argv[0]);
          printf("\n");
          
          printf("===Align reads to a reference for all data types:\n");
          printf("	Usage: %s align -nodes 60 -data ccs/ont/ont-NLR -reads input_long.fasta/q <Input_Reference> <Output_sorted_bam>\n",argv[0]);
-         printf("	Usage: %s align -nodes 60 -data ngs-HiC -fq1 read_1.fq.gz -fg2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
-         printf("	Usage: %s align -nodes 60 -data ngs-10X -fq1 read_1.fq.gz -fg2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
-         printf("	Usage: %s align -nodes 60 -data ngs-SSR -fq1 read_1.fq.gz -fg2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
+         printf("	Usage: %s align -nodes 60 -data ngs-HiC -fq1 read_1.fq.gz -fq2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
+         printf("	Usage: %s align -nodes 60 -data ngs-10X -fq1 read_1.fq.gz -fq2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
+         printf("	Usage: %s align -nodes 60 -data ngs-SSR -fq1 read_1.fq.gz -fq2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
          printf("      	 	-nodes    60      - Number of CPUs requested\n");
          printf("      		-data     ccs     - PacBio Hifi\n");
          printf("		-data     ont     - Oxford Nanopore Q20 or Q30\n");
@@ -277,6 +283,59 @@ int main(int argc, char **argv)
        }
     }
 
+    if((argc == 2)&&(flag_align == 1))
+    {
+         printf("===Align reads to a reference for all data types:\n");
+         printf("===Output a coordinate sorted bam file:\n");
+         printf("	Usage: %s align -nodes 60 -data ccs -reads input_long.fasta/q <Input_Reference> <Output_sorted_bam>\n",argv[0]);
+         printf("	Usage: %s align -nodes 60 -data ont -reads input_long.fasta/q <Input_Reference> <Output_sorted_bam>\n",argv[0]);
+         printf("	Usage: %s align -nodes 60 -data ont-NLR -reads input_long.fasta/q <Input_Reference> <Output_sorted_bam>\n",argv[0]);
+         printf("	Usage: %s align -nodes 60 -data ngs-HiC -fq1 read_1.fq.gz -fq2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
+         printf("	Usage: %s align -nodes 60 -data ngs-10X -fq1 read_1.fq.gz -fq2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
+         printf("	Usage: %s align -nodes 60 -data ngs-SSR -fq1 read_1.fq.gz -fq2 read_2.fq.gz <Input_Reference> <Output_sorted_bam>\n",argv[0]);
+         printf("      	 	-nodes    60      - Number of CPUs requested\n");
+         printf("      		-data     ccs     - PacBio Hifi\n");
+         printf("		-data     ont     - Oxford Nanopore Q20 or Q30\n");
+         printf("		-data     ont-NLR - Oxford Nanopore normal long reads (NLR)\n");
+         printf("		-data     ngs-HiC - Hi-C reads\n");
+         printf("      		-data     ngs-10X - 10X reads\n");
+         printf("		-data     ngs-SSR - Standard short reads such as Illumina data\n");
+         exit(1);
+    }
+    if((argc == 2)&&(flag_breakpoint == 1))
+    {
+         printf("===Detect breakpoints with aligned, and name sorted sam,bam or cram files:\n");
+         printf("	Usage: %s breakpoint -data ccs -bam /myspace/desk/test-sorted.bam <output_breakpoints.vcf>\n",argv[0]);
+         printf("	Usage: %s breakpoint -data ont -bam /myspace/desk/test-sorted.bam <output_breakpoints.vcf>\n",argv[0]);
+         printf("	Usage: %s breakpoint -data ngs-HiC -bam /myspace/desk/test-sorted.bam <output_breakpoints.vcf>\n",argv[0]);
+         printf("	Usage: %s breakpoint -data ngs-10X -bam /myspace/desk/test-sorted.bam <output_breakpoints.vcf>\n",argv[0]);
+         printf("	Usage: %s breakpoint -data ngs-SSR -bam /myspace/desk/test-sorted.bam <output_breakpoints.vcf>\n",argv[0]);
+         printf("      		-data     ccs     - PacBio Hifi\n");
+         printf("		-data     ont     - Oxford Nanopore Q20 or Q30\n");
+         printf("		-data     ngs-HiC - Hi-C reads\n");
+         printf("      		-data     ngs-10X - 10X reads\n");
+         printf("		-data     ngs-SSR - Standard short reads such as Illumina data\n");
+         printf("	--- Note: the sam/bam/cram file has to be Name sorted! ---\n");
+         printf("	--- If not read name sorted, please do the following:  ---\n");
+         printf("	--- samtools sort -@ 60 -n your.bam new.bam ---\n\n");
+
+         printf("===Detect breakpoints with fasta/fastq long read files:\n");
+         printf("	Usage: %s breakpoint -nodes 60 -data ccs/ont -reads input_long.fasta/q <Input_Reference> <breakpoints.vcf>\n",argv[0]);
+         printf("\n");
+         exit(1);
+    }
+    if((argc == 2)&&(flag_plot == 1))
+    {
+         printf("===Plot depth of coverage for all data types:\n");
+         printf("===Input a coordinate sorted bam file\n");
+         printf("===Output a tmp directory containing coverage images for 23 chromosomes chr{1,22,X}\n");
+         printf("	Usage: %s plot -bam /myspace/desk/test-sorted.bam -sample cancer\n",argv[0]);
+         printf("\n");
+         printf("===Without noise reduction:\n");
+         printf("	Usage: %s plot -bam /myspace/desk/test-sorted.bam -sample cancer -denoise 0\n",argv[0]);
+         printf("\n");
+         exit(1);
+    }
     pid = getpid();
     memset(tempa,'\0',2000);
     if (!getcwd(tempa, sizeof(tempa)))
@@ -329,6 +388,7 @@ int main(int argc, char **argv)
 
     if(flag_align == 1)
     {
+      memset(file_bambam,'\0',2000);
       memset(file_tarseq,'\0',2000);
       memset(file_lgread,'\0',2000);
       memset(file_Stones,'\0',2000);
@@ -337,6 +397,7 @@ int main(int argc, char **argv)
       sprintf(file_read1,"%s/%s",tempa,fq1name);
       sprintf(file_read2,"%s/%s",tempa,fq2name);
       sprintf(file_tarseq,"%s/%s",tempa,argv[args]);
+      sprintf(file_bambam,"%s/%s",tempa,datname);
       sprintf(file_Stones,"%s/%s",tempa,argv[args+1]);
       if((data_flag == 4)||(data_flag == 5))
       { 
@@ -447,21 +508,50 @@ int main(int argc, char **argv)
       return EXIT_SUCCESS;
     }
 
+    memset(file_tarseq,'\0',2000);
+    memset(file_lgread,'\0',2000);
+    memset(file_Stones,'\0',2000);
+    memset(file_snpfrq,'\0',2000);
+    memset(file_ctspec,'\0',2000);
+    memset(file_bambam,'\0',2000);
+    memset(file_datas,'\0',2000);
+
     if(flag_plot == 1)
     {
       if(bam_flag == 1)
       {
-        memset(syscmd,'\0',2000);
-//        sprintf(syscmd,"%s/samtools depth -@ %d %s | awk '%s' > depth-t2t.dat",bindir,n_nodes,datname,"($2%100==0){print $1,$2,$3}");
-        sprintf(syscmd,"%s/samtools depth -@ %d %s | awk '%s' > depth-t2t.dat",bindir,n_nodes,datname,"($2%1000==0){print $1,$2,$3}");
-        RunSystemCommand(syscmd);
+        sprintf(file_bambam,"%s/%s",tempa,datname);
+        printf("Bam file: %s %s\n",datname,file_bambam);
+        if((namef = fopen(datname,"r")) == NULL)
+        {
+          printf("File not in the working directory!\n");
+          if((namef = fopen(file_bambam,"r")) == NULL)
+          {
+            printf("BAM File %s not found and please copy it to your working directory!\n",datname);
+            exit(1);
+          }
+          else
+          {
+            printf("Input bam file: %s\n",file_bambam);
+            memset(syscmd,'\0',2000);
+            sprintf(syscmd,"%s/samtools depth -@ %d %s | awk '%s' > depth-t2t.dat",bindir,n_nodes,file_bambam,"($2%100==0){print $1,$2,$3}");
+            RunSystemCommand(syscmd);
+          }
+        }
+        else
+        {
+          printf("BAM name: %s\n",datname);
+          memset(syscmd,'\0',2000);
+          sprintf(syscmd,"%s/samtools depth -@ %d %s | awk '%s' > depth-t2t.dat",bindir,n_nodes,datname,"($2%100==0){print $1,$2,$3}");
+          RunSystemCommand(syscmd);
+        }
 
 /*      Plot coverage profiles chr by chr */
   	memset(commands,'\0',2000);
         sprintf(commands,"%s/step_depthPlot",bindir);
 
         memset(syscmd,'\0',2000);
-        sprintf(syscmd,"%s/step_commsPlot -command %s -sample %s sh.plots",bindir,commands,sample);
+        sprintf(syscmd,"%s/step_commsPlot -command %s -sample %s -denoise %d sh.plots",bindir,commands,sample,denoise_flag);
         RunSystemCommand(syscmd);
 
         memset(syscmd,'\0',2000);
@@ -497,13 +587,6 @@ int main(int argc, char **argv)
       return EXIT_SUCCESS;
     }
 
-    memset(file_tarseq,'\0',2000);
-    memset(file_lgread,'\0',2000);
-    memset(file_Stones,'\0',2000);
-    memset(file_snpfrq,'\0',2000);
-    memset(file_ctspec,'\0',2000);
-    memset(file_ctname,'\0',2000);
-    memset(file_datas,'\0',2000);
 
     if(bam_flag != 1)
     {
@@ -511,7 +594,6 @@ int main(int argc, char **argv)
       sprintf(file_tarseq,"%s/%s",tempa,argv[args]);
       sprintf(file_Stones,"%s/%s",tempa,argv[args+1]);
 //    sprintf(file_snpfrq,"%s/%s.snps",tempa,argv[args+1]);
-//    sprintf(file_ctname,"%s/%s.name",tempa,argv[args+1]);
 //    sprintf(file_ctspec,"%s/%s.spec",tempa,argv[args+1]);
 
       if((namef = fopen(file_tarseq,"r")) == NULL)
@@ -657,9 +739,31 @@ int main(int argc, char **argv)
     {
       if(bam_flag == 1)
       {
-        memset(syscmd,'\0',2000);
-        sprintf(syscmd,"%s/samtools view -@ %d %s | awk '%s' > align.dat0",bindir,n_nodes,datname,"(length($6)>5)&&($5>0){print $1,$2,$3,$4,$5,$6,$10}");
-        RunSystemCommand(syscmd);
+        sprintf(file_bambam,"%s/%s",tempa,datname);
+        printf("Bam file: %s %s\n",datname,file_bambam);
+        if((namef = fopen(datname,"r")) == NULL)
+        {
+          printf("File not in the working directory!\n");
+          if((namef = fopen(file_bambam,"r")) == NULL)
+          {
+            printf("BAM File %s not found and please copy it to your working directory!\n",datname);
+            exit(1);
+          }
+          else
+          {
+            printf("Input bam file: %s\n",file_bambam);
+            memset(syscmd,'\0',2000);
+            sprintf(syscmd,"%s/samtools view -@ %d %s | awk '%s' > align.dat0",bindir,n_nodes,file_bambam,"(length($6)>5)&&($5>0){print $1,$2,$3,$4,$5,$6,$10}");
+            RunSystemCommand(syscmd);
+          }
+        }
+        else
+        {
+          printf("Input target assembly file2: %s\n",file_bambam);
+          memset(syscmd,'\0',2000);
+          sprintf(syscmd,"%s/samtools view -@ %d %s | awk '%s' > align.dat0",bindir,n_nodes,datname,"(length($6)>5)&&($5>0){print $1,$2,$3,$4,$5,$6,$10}");
+          RunSystemCommand(syscmd);
+        }
       }
       else
       {

@@ -52,7 +52,7 @@ static int IMOD=0;
 static int n_type=0;
 static int barreads=5;
 static int file_flag=2;
-static int tiles_flag=0;
+static int denoise_flag=1;
 static int block_set=5000;
 static int edge_flag=0;
 static int nContig=0;
@@ -87,7 +87,7 @@ int main(int argc, char **argv)
 
     if(argc < 2)
     {
-      printf("Usage: %s [-chr chr1] [-sample OES103] <SAM_depth_file> <sh.coverplot>\n",argv[0]);
+      printf("Usage: %s [-chr chr1] [-sample OES103] [-denoise 1] <SAM_depth_file> <sh.coverplot>\n",argv[0]);
 
       exit(1);
     }
@@ -111,6 +111,11 @@ int main(int argc, char **argv)
          sscanf(argv[++i],"%s",sample); 
          args=args+2;
        }
+       else if(!strcmp(argv[i],"-denoise"))
+       {
+         sscanf(argv[++i],"%d",&denoise_flag);
+         args=args+2;
+       }
        else if(!strcmp(argv[i],"-file"))
        {
          sscanf(argv[++i],"%d",&file_flag);
@@ -128,12 +133,12 @@ int main(int argc, char **argv)
     {
        memset(chromo,'\0',50);
        sprintf(chromo,"chr%d",i);
-       fprintf(namef,"%s -chr %s -sample %s depth-t2t.dat sh.coverplot \n",command,chromo,sample);
+       fprintf(namef,"%s -chr %s -sample %s -denoise %d depth-t2t.dat sh.coverplot \n",command,chromo,sample,denoise_flag);
     }
 
     memset(chromo,'\0',50);
     sprintf(chromo,"chrX");
-    fprintf(namef,"%s -chr %s -sample %s depth-t2t.dat sh.coverplot \n",command,chromo,sample);
+    fprintf(namef,"%s -chr %s -sample %s -denoise %d depth-t2t.dat sh.coverplot \n",command,chromo,sample,denoise_flag);
     fclose(namef); 
    
 //    Readname_match(seq,argv,args,n_reads,nRead);

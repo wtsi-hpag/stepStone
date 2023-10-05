@@ -52,7 +52,7 @@ static int IMOD=0;
 static int n_type=0;
 static int barreads=5;
 static int file_flag=2;
-static int tiles_flag=0;
+static int denoise_flag=1;
 static int block_set=5000;
 static int edge_flag=0;
 static int nContig=0;
@@ -117,9 +117,9 @@ int main(int argc, char **argv)
          edge_flag=1;
          args=args+2;
        }
-       else if(!strcmp(argv[i],"-tile"))
+       else if(!strcmp(argv[i],"-denoise"))
        {
-         sscanf(argv[++i],"%d",&tiles_flag);
+         sscanf(argv[++i],"%d",&denoise_flag);
          args=args+2;
        }
        else if(!strcmp(argv[i],"-reads"))
@@ -269,33 +269,42 @@ void Mapping_Process(char **argv,int args,int nSeq)
                if(ctg_offset[k] > G_Size)
                  G_Size = ctg_offset[k];
             }
-	    for(k=(i+1);k<(j-1001);k++)
-            {
-	       memset(de_noise,'\0',404);
-	       memset(de_index,'\0',404);
-               de_max = 0;
-	       de_min = 999999999;
-	       id_max = 0;
-	       id_min = 0;
-	       sum_locs = 0;
-	       for(m=0;m<1000;m++)
-	       {
-		  de_noise[m] = ctg_cover[k+m];
-	          de_index[m] = m;	  
-	       }
-               ArraySort_Int2(1000,de_noise,de_index);
-	       for(m=400;m<600;m++)
-	       {
-	          sum_locs = de_noise[m]+sum_locs;
-	       }
-	       ctg_locnoi[k] = sum_locs/200;
-	    }
-
-    	    for(k=(i+1);k<(j-1001);k++)
-            {
+	    if(denoise_flag == 0)
+	    {
+	      for(k=(i+1);k<j;k++)
+                 fprintf(namef,"%d %d\n",ctg_offset[k],ctg_cover[k]);
 //               fprintf(namef,"%d %d\n",ctg_offset[k],ctg_cover[k]);
-               fprintf(namef,"%d %d\n",ctg_offset[k],ctg_locnoi[k]);
-            }
+	    }
+	    else
+	    {
+	      for(k=(i+1);k<(j-1001);k++)
+              {
+	         memset(de_noise,'\0',4004);
+	         memset(de_index,'\0',4004);
+                 de_max = 0;
+	         de_min = 999999999;
+	         id_max = 0;
+	         id_min = 0;
+	         sum_locs = 0;
+    	         for(m=0;m<1000;m++)
+	         {
+		    de_noise[m] = ctg_cover[k+m];
+	            de_index[m] = m;	  
+	         }
+                 ArraySort_Int2(1000,de_noise,de_index);
+	         for(m=400;m<600;m++)
+	         {
+	            sum_locs = de_noise[m]+sum_locs;
+	         }
+	         ctg_locnoi[k] = sum_locs/200;
+	      }
+
+    	      for(k=(i+1);k<(j-1001);k++)
+              {
+//               fprintf(namef,"%d %d\n",ctg_offset[k],ctg_cover[k]);
+                 fprintf(namef,"%d %d\n",ctg_offset[k],ctg_locnoi[k]);
+              }
+	    }
         }
         else
         {
