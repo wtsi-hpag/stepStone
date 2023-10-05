@@ -38,8 +38,8 @@ Commands:                                               \
            $ ./stepStone align -nodes 60 -data ngs-HiC -reads input_long.fasta/q <Input_Reference> <Output_sorted_bam>            \
            $ ./stepStone align -nodes 60 -data ngs-10X -reads input_long.fasta/q <Input_Reference> <Output_sorted_bam>            \
            $ ./stepStone align -nodes 60 -data ngs-SSR -reads input_long.fasta/q <Input_Reference> <Output_sorted_bam>            \
-      	 	-nodes    60      - Number of CPUs requested                                                                        \
-      		-data     ccs     - PacBio Hifi                                                                                     \
+		-nodes    60      - Number of CPUs requested                                                                       \
+		-data     ccs     - PacBio HiFi                                                                      \
 		-data     ont     - Oxford Nanopore Q20 or Q30                                                                      \
 		-data     ont-NLR - Oxford Nanopore normal long reads (NLR)                                                         \
 		-data     ngs-HiC - Hi-C reads                                                                                      \
