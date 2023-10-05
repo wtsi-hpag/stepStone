@@ -17,7 +17,7 @@ The genome aligner BWA-mem2 (https://github.com/bwa-mem2/bwa-mem2), minimap2 (ht
 Program: stepStone - a pipeline to identify chromothripsis breakpoints and rearrangements
 Version: 2.0
 
-Usage: ./stepStone command [options]			\
+           $ /full/path/to/stepStone/src/stepStone command [options]           \
 
 Commands:                                               \
 -- breakpoints		Detect breakpoints              \
@@ -48,19 +48,19 @@ Commands:                                               \
 
 ### Breakpoint Detection
 
-           $ /full/path/to/stepStone/src/stepStone breakpoint           \
+           $ /full/path/to/stepStone/src/stepStone breakpoint                                     \
 
 ===Detect breakpoints with aligned, and name sorted sam,bam or cram files:                        \
 
-           $ ./stepStone breakpoint -data ccs -bam mysorted.bam <output_breakpoints.vcf>           \
-           $ ./stepStone breakpoint -data ont -bam mysorted.bam <output_breakpoints.vcf>           \
-           $ ./stepStone breakpoint -data ngs-HiC -bam mysorted.bam <output_breakpoints.vcf>           \
-           $ ./stepStone breakpoint -data ngs-10x -bam mysorted.bam <output_breakpoints.vcf>           \
-           $ ./stepStone breakpoint -data ngs-SSR -bam mysorted.bam <output_breakpoints.vcf>           \
-		-data     ccs     - PacBio HiFi                                    \
+           $ ./stepStone breakpoint -data ccs -bam mysorted.bam <output_breakpoints.vcf>          \
+           $ ./stepStone breakpoint -data ont -bam mysorted.bam <output_breakpoints.vcf>          \
+           $ ./stepStone breakpoint -data ngs-HiC -bam mysorted.bam <output_breakpoints.vcf>      \
+           $ ./stepStone breakpoint -data ngs-10x -bam mysorted.bam <output_breakpoints.vcf>      \
+           $ ./stepStone breakpoint -data ngs-SSR -bam mysorted.bam <output_breakpoints.vcf>      \
+		-data     ccs     - PacBio HiFi                                                   \
 		-data     ont     - Oxford Nanopore Q20 or Q30                                    \
 		-data     ngs-HiC - Hi-C reads                                                    \
-		-data     ngs-10X - 10X reads                                                    \
+		-data     ngs-10X - 10X reads                                                     \
 		-data     ngs-SSR - Standard short reads such as Illumina data                    \
 	--- Note: the sam/bam/cram file has to be Name sorted! ---                                \
 	--- If not read name sorted, please do the following:  ---                                \
@@ -68,20 +68,20 @@ Commands:                                               \
 
 ===Detect breakpoints with fasta/fastq long read files:                                           \
 
-           $ /full/path/to/stepStone/src/stepStone breakpoint           \
+           $ /full/path/to/stepStone/src/stepStone breakpoint                                     \
 	      -nodes 60 -data ccs/ont -reads input_long.fasta/q <Input_Reference> <breakpoints.vcf>   \
 
 ### Coverage Plots 
 
-           $ /full/path/to/stepStone/src/stepStone plot           				\
+           $ /full/path/to/stepStone/src/stepStone plot           				 \
 
 ===Plot depth of coverage for all data types:                                                    \
-====Input a coordinate sorted bam file                                                            \
-====Output a tmp directory containing coverage images for 23 chromosomes chr{1,22,X}              \
+====Input a coordinate sorted bam file                                                           \
+====Output a tmp directory containing coverage images for 23 chromosomes chr{1,22,X}             \
 
-           $ /full/path/to/stepStone/src/stepStone plot -bam mysorted.bam -sample cancer            \
+           $ /full/path/to/stepStone/src/stepStone plot -bam mysorted.bam -sample cancer         \
 
-===Without noise reduction:                                                                         \ 
+===Without noise reduction:                                                                      \ 
 
            $ /full/path/to/stepStone/src/stepStone plot -bam mysorted.bam -sample cancer -denoise 0 \
 
