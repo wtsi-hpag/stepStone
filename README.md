@@ -10,10 +10,10 @@ A pipeline for identification of chromothripsis breakpoints and cancer rearrange
 If everything compiled successfully you must see the final comment: 
 		"Congrats: installation successful!"		
 
-#### External packages
+### External packages
 The genome aligner BWA-mem2 (https://github.com/bwa-mem2/bwa-mem2), minimap2 (https://github.com/lh3/minimap2) and samtools (http://www.htslib.org) are downloaded and compiled by stepStone.
 
-#### Run the pipelines
+### Run the pipelines
 Program: stepStone - a pipeline to identify chromothripsis breakpoints and rearrangements
 Version: 2.0
 
@@ -25,12 +25,13 @@ Commands:                                               \
 -- align		Align reads to a reference      \
 
 
-#### Read Alignments 
+### Read Alignments 
 
            $ /full/path/to/stepStone/src/stepStone align           \
 
 ===Align reads to a reference for all data types:                  \                                                                                   
 ===Output a coordinate sorted bam file:                                                                                       \
+
            $ ./stepStone align -nodes 60 -data ccs -reads input_long.fasta/q <Input_Reference> <Output_sorted_bam>            \
            $ ./stepStone align -nodes 60 -data ont -reads input_long.fasta/q <Input_Reference> <Output_sorted_bam>            \
            $ ./stepStone align -nodes 60 -data ont-NLR -reads input_long.fasta/q <Input_Reference> <Output_sorted_bam>            \
@@ -45,16 +46,17 @@ Commands:                                               \
       		-data     ngs-10X - 10X reads                                                                                       \
 		-data     ngs-SSR - Standard short reads such as Illumina data                                                      \
 
-#### Breakpoint Detection
+### Breakpoint Detection
 
            $ /full/path/to/stepStone/src/stepStone breakpoint           \
 
 ===Detect breakpoints with aligned, and name sorted sam,bam or cram files:                        \
-           $ stepStone breakpoint -data ccs -bam mysorted.bam <output_breakpoints.vcf>           \
-           $ stepStone breakpoint -data ont -bam mysorted.bam <output_breakpoints.vcf>           \
-           $ stepStone breakpoint -data ngs-HiC -bam mysorted.bam <output_breakpoints.vcf>           \
-           $ stepStone breakpoint -data ngs-10x -bam mysorted.bam <output_breakpoints.vcf>           \
-           $ stepStone breakpoint -data ngs-SSR -bam mysorted.bam <output_breakpoints.vcf>           \
+
+           $ ./stepStone breakpoint -data ccs -bam mysorted.bam <output_breakpoints.vcf>           \
+           $ ./stepStone breakpoint -data ont -bam mysorted.bam <output_breakpoints.vcf>           \
+           $ ./stepStone breakpoint -data ngs-HiC -bam mysorted.bam <output_breakpoints.vcf>           \
+           $ ./stepStone breakpoint -data ngs-10x -bam mysorted.bam <output_breakpoints.vcf>           \
+           $ ./stepStone breakpoint -data ngs-SSR -bam mysorted.bam <output_breakpoints.vcf>           \
       		-data     ccs     - PacBio Hifi                                                   \
 		-data     ont     - Oxford Nanopore Q20 or Q30                                    \
 		-data     ngs-HiC - Hi-C reads                                                    \
@@ -65,16 +67,17 @@ Commands:                                               \
 	--- samtools sort -@ 60 -n your.bam new.bam ---                                           \
 
 ===Detect breakpoints with fasta/fastq long read files:                                           \
+
            $ /full/path/to/stepStone/src/stepStone breakpoint           \
 	      -nodes 60 -data ccs/ont -reads input_long.fasta/q <Input_Reference> <breakpoints.vcf>   \
 
-#### Coverage Plots 
+### Coverage Plots 
 
-           $ /full/path/to/stepStone/src/stepStone plot           \
+           $ /full/path/to/stepStone/src/stepStone plot           				\
 
 ===Plot depth of coverage for all data types:                                                    \
-===Input a coordinate sorted bam file                                                            \
-===Output a tmp directory containing coverage images for 23 chromosomes chr{1,22,X}              \
+====Input a coordinate sorted bam file                                                            \
+====Output a tmp directory containing coverage images for 23 chromosomes chr{1,22,X}              \
 
            $ /full/path/to/stepStone/src/stepStone plot -bam mysorted.bam -sample cancer            \
 
