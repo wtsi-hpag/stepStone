@@ -20,9 +20,9 @@ Version: 2.0
            $ /full/path/to/stepStone/src/stepStone command [options]           \
 
 Commands:                                               \
--- breakpoints		Detect breakpoints              \
--- plot			Plot depth of coverage          \
 -- align		Align reads to a reference      \
+-- plot			Plot depth of coverage          \
+-- breakpoint		Detect breakpoints              \
 
 
 ### Read Alignments 
@@ -85,3 +85,13 @@ Commands:                                               \
 
            $ /full/path/to/stepStone/src/stepStone plot -bam mysorted.bam -sample cancer -denoise 0 \
 
+### Best Practices 
+
+1. Align the reads to obtain a coordinate sorted bam file;
+2. Generate coverage plots;
+3. samtools sort -@ 60 -n your.bam new.bam;
+4. Detect breakpoints using new.bam
+
+Please contact Zemin Ning ( zn1@sanger.ac.uk ) for any further information. 
+
+ 
