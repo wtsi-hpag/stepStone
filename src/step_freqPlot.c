@@ -53,7 +53,8 @@ static int n_type=0;
 static int barreads=5;
 static int file_flag=2;
 static int tiles_flag=0;
-static int block_set=5000;
+static int denoise_flag=1;
+static int y_hight=180;
 static int edge_flag=0;
 static int nContig=0;
 static int G_Size = 0;
@@ -111,12 +112,6 @@ int main(int argc, char **argv)
          sscanf(argv[++i],"%s",sample); 
          args=args+2;
        }
-       else if(!strcmp(argv[i],"-block"))
-       {
-         sscanf(argv[++i],"%d",&block_set);
-         edge_flag=1;
-         args=args+2;
-       }
        else if(!strcmp(argv[i],"-tile"))
        {
          sscanf(argv[++i],"%d",&tiles_flag);
@@ -125,6 +120,16 @@ int main(int argc, char **argv)
        else if(!strcmp(argv[i],"-reads"))
        {
          sscanf(argv[++i],"%d",&barreads);
+         args=args+2;
+       }
+       else if(!strcmp(argv[i],"-denoise"))
+       {
+         sscanf(argv[++i],"%d",&denoise_flag);
+         args=args+2;
+       }
+       else if(!strcmp(argv[i],"-hight"))
+       {
+         sscanf(argv[++i],"%d",&y_hight);
          args=args+2;
        }
        else if(!strcmp(argv[i],"-max"))

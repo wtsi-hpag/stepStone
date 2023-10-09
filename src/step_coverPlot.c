@@ -52,6 +52,7 @@ static int IMOD=0;
 static int n_type=0;
 static int barreads=5;
 static int file_flag=2;
+static int y_hight=180;
 static int tiles_flag=0;
 static int block_set=5000;
 static int edge_flag=0;
@@ -115,6 +116,11 @@ int main(int argc, char **argv)
        {
          sscanf(argv[++i],"%d",&block_set);
          edge_flag=1;
+         args=args+2;
+       }
+       else if(!strcmp(argv[i],"-hight"))
+       {
+         sscanf(argv[++i],"%d",&y_hight);
          args=args+2;
        }
        else if(!strcmp(argv[i],"-tile"))
@@ -220,7 +226,8 @@ void Mapping_Process(char **argv,int args,int nSeq)
      strcpy(KKK3,"set xlabel \\\"Chromosome coordinate\\\"");     
      strcpy(KKK4,"set ylabel \\\"Base coverage\\\"");     
      strcpy(KKK5,"plot [ 1 to");
-     strcpy(KKK7,"[ 1 to 150 ] ");
+     sprintf(KKK7,"%s%d%s","[ 1 to ",y_hight," ] ");
+//     strcpy(KKK7,"[ 1 to 150 ] ");
 //     strcpy(KKK7,"[ 1 to 300 ] ");
      strcpy(KKK6,"with lines ls 1");     
      num_hits =0;

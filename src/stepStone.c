@@ -61,12 +61,14 @@ static int plot_flag = 0;
 static int NLR_flag = 0;
 static int flag_align = 0;
 static int flag_plot = 0;
+static int window_size = 100;
 static int flag_breakpoint = 0;
 static int min_len = 3000;
 static int bam_flag = 0;
 static int data_flag = 1;
 static int platform_tag = 1;
 static int denoise_flag = 1;
+static int y_hight = 180;
 static int n_cover = 5;
 
 void
@@ -92,7 +94,7 @@ int main(int argc, char **argv)
     int size_file;
     int m_score,n_nodes,n_debug,num_sigma;
     void Memory_Allocate(int arr);
-    char tempa[2000],tempc[2000],syscmd[2000],workdir[2000],commands[2000];
+    char tempa[2000],tempc[2000],syscmd[2000],workdir[2000],commands[2000],window_word[100];
     char file_tarseq[2000],file_Stones[2000],file_snpfrq[2000],file_datas[2000],file_bambam[2000],file_ctspec[2000];
     char file_lgread[2000],samname[500],bamname[500],toolname[500],fastname[500],datname[500];
     char file_read1[2000],file_read2[2000],fq1name[500],fq2name[500];
@@ -206,6 +208,11 @@ int main(int argc, char **argv)
          sscanf(argv[++i],"%s",datname);
          args=args+2;
        }
+       else if(!strcmp(argv[i],"-window"))
+       {
+         sscanf(argv[++i],"%d",&window_size);
+         args=args+2;
+       }
        else if(!strcmp(argv[i],"-platform"))
        {
          run_align = 1;
@@ -215,6 +222,11 @@ int main(int argc, char **argv)
        else if(!strcmp(argv[i],"-denoise"))
        {
          sscanf(argv[++i],"%d",&denoise_flag);
+         args=args+2;
+       }
+       else if(!strcmp(argv[i],"-hight"))
+       {
+         sscanf(argv[++i],"%d",&y_hight);
          args=args+2;
        }
        else if(!strcmp(argv[i],"-fasta"))
@@ -329,7 +341,10 @@ int main(int argc, char **argv)
          printf("===Plot depth of coverage for all data types:\n");
          printf("===Input a coordinate sorted bam file\n");
          printf("===Output a tmp directory containing coverage images for 23 chromosomes chr{1,22,X}\n");
-         printf("	Usage: %s plot -bam /myspace/desk/test-sorted.bam -sample cancer\n",argv[0]);
+         printf("	Usage: %s plot -bam /myspace/desk/test-sorted.bam -sample cancer-XXX -hight 250 -window 100 \n",argv[0]);
+         printf("      		  -sample:   Sample name\n");
+         printf("      		  -hight:    Maximum value in Y axis (read depth)\n");
+         printf("      		  -window:   Window size to display chromosome coordinates\n");
          printf("\n");
          printf("===Without noise reduction:\n");
          printf("	Usage: %s plot -bam /myspace/desk/test-sorted.bam -sample cancer -denoise 0\n",argv[0]);
@@ -533,16 +548,22 @@ int main(int argc, char **argv)
           else
           {
             printf("Input bam file: %s\n",file_bambam);
+	    memset(window_word,'\0',100);
+	    sprintf(window_word,"($%s%d==0)","2%",window_size);
             memset(syscmd,'\0',2000);
-            sprintf(syscmd,"%s/samtools depth -@ %d %s | awk '%s' > depth-t2t.dat",bindir,n_nodes,file_bambam,"($2%100==0){print $1,$2,$3}");
+            sprintf(syscmd,"%s/samtools depth -@ %d %s | awk '%s%s' > depth-t2t.dat",bindir,n_nodes,file_bambam,window_word,"{print $1,$2,$3}");
+            printf("Command: %d %s\n",window_size,syscmd);
             RunSystemCommand(syscmd);
           }
         }
         else
         {
           printf("BAM name: %s\n",datname);
+	  memset(window_word,'\0',100);
+	  sprintf(window_word,"($%s%d==0)","2%",window_size);
           memset(syscmd,'\0',2000);
-          sprintf(syscmd,"%s/samtools depth -@ %d %s | awk '%s' > depth-t2t.dat",bindir,n_nodes,datname,"($2%100==0){print $1,$2,$3}");
+          sprintf(syscmd,"%s/samtools depth -@ %d %s | awk '%s%s' > depth-t2t.dat",bindir,n_nodes,datname,window_word,"{print $1,$2,$3}");
+            printf("Command: %d %s\n",window_size,syscmd);
           RunSystemCommand(syscmd);
         }
 
@@ -551,7 +572,7 @@ int main(int argc, char **argv)
         sprintf(commands,"%s/step_depthPlot",bindir);
 
         memset(syscmd,'\0',2000);
-        sprintf(syscmd,"%s/step_commsPlot -command %s -sample %s -denoise %d sh.plots",bindir,commands,sample,denoise_flag);
+        sprintf(syscmd,"%s/step_commsPlot -command %s -sample %s -denoise %d -hight %d sh.plots",bindir,commands,sample,denoise_flag,y_hight);
         RunSystemCommand(syscmd);
 
         memset(syscmd,'\0',2000);

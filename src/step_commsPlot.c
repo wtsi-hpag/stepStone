@@ -53,6 +53,7 @@ static int n_type=0;
 static int barreads=5;
 static int file_flag=2;
 static int denoise_flag=1;
+static int y_hight=180;
 static int block_set=5000;
 static int edge_flag=0;
 static int nContig=0;
@@ -87,7 +88,7 @@ int main(int argc, char **argv)
 
     if(argc < 2)
     {
-      printf("Usage: %s [-chr chr1] [-sample OES103] [-denoise 1] <SAM_depth_file> <sh.coverplot>\n",argv[0]);
+      printf("Usage: %s [-chr chr1] [-sample OES103] [-denoise 1] [-hight 180] <SAM_depth_file> <sh.coverplot>\n",argv[0]);
 
       exit(1);
     }
@@ -116,6 +117,11 @@ int main(int argc, char **argv)
          sscanf(argv[++i],"%d",&denoise_flag);
          args=args+2;
        }
+       else if(!strcmp(argv[i],"-hight"))
+       {
+         sscanf(argv[++i],"%d",&y_hight);
+         args=args+2;
+       }
        else if(!strcmp(argv[i],"-file"))
        {
          sscanf(argv[++i],"%d",&file_flag);
@@ -133,12 +139,12 @@ int main(int argc, char **argv)
     {
        memset(chromo,'\0',50);
        sprintf(chromo,"chr%d",i);
-       fprintf(namef,"%s -chr %s -sample %s -denoise %d depth-t2t.dat sh.coverplot \n",command,chromo,sample,denoise_flag);
+       fprintf(namef,"%s -chr %s -sample %s -denoise %d -hight %d depth-t2t.dat sh.coverplot \n",command,chromo,sample,denoise_flag,y_hight);
     }
 
     memset(chromo,'\0',50);
     sprintf(chromo,"chrX");
-    fprintf(namef,"%s -chr %s -sample %s -denoise %d depth-t2t.dat sh.coverplot \n",command,chromo,sample,denoise_flag);
+    fprintf(namef,"%s -chr %s -sample %s -denoise %d -hight %d depth-t2t.dat sh.coverplot \n",command,chromo,sample,denoise_flag,y_hight);
     fclose(namef); 
    
 //    Readname_match(seq,argv,args,n_reads,nRead);
@@ -176,7 +182,8 @@ void Mapping_Process(char **argv,int args,int nSeq)
      strcpy(KKK3,"set xlabel \\\"Chromosome coordinate\\\"");     
      strcpy(KKK4,"set ylabel \\\"Base coverage\\\"");     
      strcpy(KKK5,"plot [ 1 to");
-     strcpy(KKK7,"[ 1 to 150 ] ");
+//     strcpy(KKK7,"[ 1 to 150 ] ");
+     sprintf(KKK7,"%s%d%s","[ 1 to ",y_hight," ] ");
 //     strcpy(KKK7,"[ 1 to 300 ] ");
      strcpy(KKK6,"with lines ls 1");     
      num_hits =0;
