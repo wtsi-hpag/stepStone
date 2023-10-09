@@ -1,4 +1,4 @@
-# stepStone v2.0
+# stepStone v1.2
 A pipeline for identification of chromothripsis breakpoints and cancer rearrangements
 
 ### Download and Compile:
