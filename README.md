@@ -79,7 +79,12 @@ Commands:                                               \
 ====Input a coordinate sorted bam file                                                           \
 ====Output a tmp directory containing coverage images for 23 chromosomes chr{1,22,X}             \
 
-           $ /full/path/to/stepStone/src/stepStone plot -bam mysorted.bam -sample cancer         \
+           $ /full/path/to/stepStone/src/stepStone plot -bam mysorted.bam -sample cancer-XXX     \
+	      -hight 250 -window 100  								 \
+	      			 								 \
+	      -sample:   Sample name:		  						 \
+	      -hight: 	 Maximum value in Y axis (read depth)  					 \
+	      -window: 	 Window size to display chromosome coordinates  			 \
 
 ===Without noise reduction:                                                                      \ 
 
@@ -91,6 +96,11 @@ Commands:                                               \
 2. Generate coverage plots;
 3. samtools sort -@ 60 -n your.bam new.bam;
 4. Detect breakpoints using new.bam
+
+###Note:
+
+1. When you have high read coverage, or high level of aneuploidy, you need to adjust "hight";
+2. Window size gives you a chance to display the density of data points in plots.
 
 Please contact Zemin Ning ( zn1@sanger.ac.uk ) for any further information. 
 
