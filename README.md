@@ -73,18 +73,19 @@ Commands:                                               \
 
 ### Coverage Plots 
 
-           $ /full/path/to/stepStone/src/stepStone plot           				 \
+           $ /full/path/to/stepStone/src/stepStone plot           				\
 
-===Plot depth of coverage for all data types:                                                    \
-====Input a coordinate sorted bam file                                                           \
-====Output a tmp directory containing coverage images for 23 chromosomes chr{1,22,X}             \
+===Plot depth of coverage for all data types:                                                   \
+====Input a coordinate sorted bam file                                                          \
+====Output a tmp directory containing coverage images for 23 chromosomes chr{1,22,X}            \
 
-           $ /full/path/to/stepStone/src/stepStone plot -bam mysorted.bam -sample cancer-XXX     \
-	         -hight 250 -window 100  							 \
-	      			 								 \
-	      -sample:   Sample name		  						 \
-	      -hight: 	 Maximum value in Y axis (read depth)  					 \
-	      -window: 	 Window size to display chromosome coordinates  			 \
+           $ /full/path/to/stepStone/src/stepStone plot -bam mysorted.bam -sample cancer-XXX    \
+	         -hight 180 -window 100 -denoise 1  					      	\	
+	      			 								\
+	      -sample:   Sample name		  						\
+	      -hight 	(180): 	Maximum value in Y axis (read depth)  					\
+	      -window 	(100): 	Window size to display chromosome coordinates  			\
+	      -denoise 	(1):  	Noise reduction option {0,1,2}  			 		\
 
 ===Without noise reduction:                                                                      \ 
 
