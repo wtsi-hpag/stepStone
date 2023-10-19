@@ -205,9 +205,10 @@ void Mapping_Process(char **argv,int args,int nSeq)
 /* =============================== */
 {
      int i,j,k,m,n,n_chr,n_oando;
-     int num_hits,num_pairs,num_blocks,num_trans,num_sends,num_reads;
+     int num_hits,num_pairs,wgs_depth,num_trans,num_sends,num_reads;
      int stopflag,*chr_trans,*chr_rdhit,*chr_inchr;
      int offset,offset1,offset2,block_len,block_ttt,de_noise[1001],de_index[1001];
+     long int wgs_all;
      float rate1,rate2,rate3;
      FILE *namef;
      int de_max,de_min,id_max,id_min,sum_locs;
@@ -222,7 +223,10 @@ void Mapping_Process(char **argv,int args,int nSeq)
      n_oando = 1;
 
      strcpy(KKK1,"set terminal svg");     
-     strcpy(KKK2,"set style line 1 lt 1 lw 1 pt 1 linecolor rgb \\\"red\\\"");     
+     if(denoise_flag <= 1)
+       strcpy(KKK2,"set style line 1 lt 1 lw 3 pt 7 linecolor rgb \\\"black\\\"");     
+     else
+       strcpy(KKK2,"set style line 1 lt 1 lw 2 pt 1 linecolor rgb \\\"black\\\"");     
      strcpy(KKK3,"set xlabel \\\"Chromosome coordinate\\\"");     
      strcpy(KKK4,"set ylabel \\\"Base coverage\\\"");     
      strcpy(KKK5,"plot [ 1 to");
@@ -246,11 +250,26 @@ void Mapping_Process(char **argv,int args,int nSeq)
        exit(1);
      }
 
+     wgs_depth = 0;
+     wgs_all = 0;
+     for(i=0;i<nSeq;i++)
+        wgs_all = wgs_all + ctg_cover[i];
+
+     if(nSeq > 0)
+       wgs_depth = wgs_all/nSeq;
+     else
+     {
+       printf("No input data! \n");
+       exit(1);
+     }
+
+     wgs_depth = wgs_depth*0.5;
+     printf("Depth: %d \n",wgs_depth);
+
      for(i=0;i<(nSeq-1);i++)
      {
         stopflag=0;
         j=i+1;
-        num_blocks = 0;
         while((j<nSeq)&&(stopflag==0))
         {
           if(strcmp(S_Name[j],chromo)==0)
@@ -276,8 +295,48 @@ void Mapping_Process(char **argv,int args,int nSeq)
                  fprintf(namef,"%d %d\n",ctg_offset[k],ctg_cover[k]);
 //               fprintf(namef,"%d %d\n",ctg_offset[k],ctg_cover[k]);
 	    }
-	    else
+	    else if(denoise_flag == 1)
 	    {
+	      for(k=(i+1);k<(j-1001);k++)
+              {
+                 memset(de_noise,'\0',4004);
+                 memset(de_index,'\0',4004);
+                 de_max = 0;
+                 de_min = 999999999;
+                 id_max = 0;
+                 id_min = 0;
+                 sum_locs = 0;
+                 for(m=0;m<1000;m++)
+                 {
+                    de_noise[m] = ctg_cover[k+m];
+                    de_index[m] = m;
+                 }
+                 ArraySort_Int2(1000,de_noise,de_index);
+                 for(m=400;m<600;m++)
+                 {
+                    sum_locs = de_noise[m]+sum_locs;
+                 }
+                 ctg_locnoi[k] = sum_locs/200;
+              }
+
+              for(k=(i+1);k<(j-1001);k++)
+              {
+//               fprintf(namef,"%d %d\n",ctg_offset[k],ctg_cover[k]);
+                 fprintf(namef,"%d %d\n",ctg_offset[k],ctg_locnoi[k]);
+              }
+	    }
+	    else if(denoise_flag == 2)
+	    {
+              int cover_ave = wgs_depth;
+              int ave = 0;
+              int edg1 = cover_ave/3;
+              int edg2 = cover_ave*1.5;
+              int edg3 = cover_ave*2.5;
+              int edg4 = cover_ave*3.5;
+              int edg5 = cover_ave*4.5;
+              int edg6 = cover_ave*5.5;
+              int s_len;
+
 	      for(k=(i+1);k<(j-1001);k++)
               {
 	         memset(de_noise,'\0',4004);
@@ -297,7 +356,42 @@ void Mapping_Process(char **argv,int args,int nSeq)
 	         {
 	            sum_locs = de_noise[m]+sum_locs;
 	         }
-	         ctg_locnoi[k] = sum_locs/200;
+//	         ctg_locnoi[k] = sum_locs/200;
+	         s_len = sum_locs/200;
+
+
+		 if((s_len >= 15)&&(s_len < edg2))
+                 {
+                   ave = cover_ave;
+                   s_len = ave + (s_len-ave)*0.5;
+                 }
+                 else if((s_len >= edg2)&&(s_len < edg3))
+                 {
+                   ave = 2*cover_ave;
+                   s_len = ave + (s_len-ave)*0.4;
+                 }
+                 else if((s_len >= edg3)&&(s_len < edg4))
+                 {
+                   ave = 3*cover_ave;
+                   s_len = ave + (s_len-ave)*0.3;
+                 }
+                 else if((s_len >= edg4)&&(s_len < edg5))
+                 {
+                   ave = 4*cover_ave;
+                   s_len = ave + (s_len-ave)*0.2;
+                 }
+                 else if((s_len >= edg5)&&(s_len < edg6))
+                 {
+                   ave = 5*cover_ave;
+                   s_len = ave + (s_len-ave)*0.15;
+                 }
+                 else if((s_len >= edg6)&&(s_len < 260))
+                 {
+                   ave = 6*cover_ave;
+                   s_len = ave + (s_len-ave)*0.1;
+                 }
+
+		 ctg_locnoi[k] = s_len;
 	      }
 
     	      for(k=(i+1);k<(j-1001);k++)

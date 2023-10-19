@@ -341,10 +341,11 @@ int main(int argc, char **argv)
          printf("===Plot depth of coverage for all data types:\n");
          printf("===Input a coordinate sorted bam file\n");
          printf("===Output a tmp directory containing coverage images for 23 chromosomes chr{1,22,X}\n");
-         printf("	Usage: %s plot -bam /myspace/desk/test-sorted.bam -sample cancer-XXX -hight 250 -window 100 \n",argv[0]);
+         printf("	Usage: %s plot -bam /myspace/desk/test-sorted.bam -sample cancer-XXX -hight 180 -window 100 -denoise 1\n",argv[0]);
          printf("      		  -sample:   Sample name\n");
          printf("      		  -hight:    Maximum value in Y axis (read depth)\n");
          printf("      		  -window:   Window size to display chromosome coordinates\n");
+         printf("      		  -denoise:  Noise reduction option {0,1,2}\n");
          printf("\n");
          printf("===Without noise reduction:\n");
          printf("	Usage: %s plot -bam /myspace/desk/test-sorted.bam -sample cancer -denoise 0\n",argv[0]);
