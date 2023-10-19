@@ -71,7 +71,7 @@ Commands:                                               \
            $ /full/path/to/stepStone/src/stepStone breakpoint                                     \
 	      -nodes 60 -data ccs/ont -reads input_long.fasta/q <Input_Reference> <breakpoints.vcf>   \
 
-### Coverage Plots 
+### Coverage/Aneuploidy Plots 
 
            $ /full/path/to/stepStone/src/stepStone plot           				\
 
