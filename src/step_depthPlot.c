@@ -52,7 +52,7 @@ static int IMOD=0;
 static int n_type=0;
 static int barreads=5;
 static int file_flag=2;
-static int denoise_flag=1;
+static int denoise_flag=3;
 static int y_hight=180;
 static int edge_flag=0;
 static int nContig=0;
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
     void Assemble_SM(int arr,int brr);
     void Mapping_Process(char **argv,int args,int nSeq);
     void Memory_Allocate(int arr);
-    char line[2000]={0},temp[60],cc[60],RC[5],readname[60],*st,*ed;
+    char line[2000]={0},temp[60],cc[60],RC[5],chrname[200],*st,*ed;
     char **cmatrix(long nrl,long nrh,long ncl,long nch);
 
     if(argc < 2)
@@ -180,8 +180,15 @@ int main(int argc, char **argv)
     }
 /*  read the alignment files         */
     i=0;
-    while(fscanf(namef,"%s %d %d",S_Name[i],&ctg_offset[i],&ctg_cover[i])!=EOF)
+    while(fscanf(namef,"%s %d %d",chrname,&ctg_offset[i],&ctg_cover[i])!=EOF)
     {
+        if((strncmp(chrname,"chr",3))==0)
+	   strcpy(S_Name[i],chrname);
+	else
+	{
+	   sprintf(S_Name[i],"%s%s","chr",chrname);
+//    printf("Plot: %s %s\n",S_Name[i],chrname);
+	}
         i++;
     }
     fclose(namef);
@@ -217,21 +224,32 @@ void Mapping_Process(char **argv,int args,int nSeq)
      void ArraySort_Int2(int n, int *arr, int *brr);
      char **cmatrix(long nrl,long nrh,long ncl,long nch);
      void ArraySort_String(int n,char **Pair_Name,int *brr);
-     char KKK1[100],KKK2[100],KKK3[100],KKK4[100],KKK5[100],KKK6[100],KKK7[100];
+     char KKK1[100],KKK10[100],KKK2[100],KKK3[100],KKK4[100],KKK5[100],KKK6[100],KKK7[100];
      char *st,*ed,Sam_name[30],syscmd[2000],Chr_name[30];
 
      n_oando = 1;
 
+     if(denoise_flag == 3)
+     {
+       strcpy(KKK10,"set logscale y"); 
+       y_hight = 10;    
+     }
      strcpy(KKK1,"set terminal svg");     
      if(denoise_flag <= 1)
        strcpy(KKK2,"set style line 1 lt 1 lw 3 pt 7 linecolor rgb \\\"black\\\"");     
      else
        strcpy(KKK2,"set style line 1 lt 1 lw 2 pt 1 linecolor rgb \\\"black\\\"");     
      strcpy(KKK3,"set xlabel \\\"Chromosome coordinate\\\"");     
-     strcpy(KKK4,"set ylabel \\\"Base coverage\\\"");     
+     if(denoise_flag == 3)
+       strcpy(KKK4,"set ylabel \\\"Copy numbers (dimensionless)\\\"");     
+     else
+       strcpy(KKK4,"set ylabel \\\"Base coverage\\\"");     
      strcpy(KKK5,"plot [ 1 to");
 //     strcpy(KKK7,"[ 1 to 150 ] ");
-     sprintf(KKK7,"%s%d%s","[ 1 to ",y_hight," ] ");
+     if(denoise_flag == 3)
+       strcpy(KKK7,"[ 0.1 to 10.0 ] ");
+     else
+       sprintf(KKK7,"%s%d%s","[ 1 to ",y_hight," ] ");
 //     strcpy(KKK7,"[ 1 to 300 ] ");
      strcpy(KKK6,"with lines ls 1");     
      num_hits =0;
@@ -323,6 +341,44 @@ void Mapping_Process(char **argv,int args,int nSeq)
               {
 //               fprintf(namef,"%d %d\n",ctg_offset[k],ctg_cover[k]);
                  fprintf(namef,"%d %d\n",ctg_offset[k],ctg_locnoi[k]);
+              }
+	    }
+	    else if(denoise_flag == 3)
+	    {
+	      for(k=(i+1);k<(j-1001);k++)
+              {
+                 memset(de_noise,'\0',4004);
+                 memset(de_index,'\0',4004);
+                 de_max = 0;
+                 de_min = 999999999;
+                 id_max = 0;
+                 id_min = 0;
+                 sum_locs = 0;
+                 for(m=0;m<1000;m++)
+                 {
+                    de_noise[m] = ctg_cover[k+m];
+                    de_index[m] = m;
+                 }
+                 ArraySort_Int2(1000,de_noise,de_index);
+                 for(m=400;m<600;m++)
+                 {
+                    sum_locs = de_noise[m]+sum_locs;
+                 }
+                 ctg_locnoi[k] = sum_locs/200;
+              }
+
+              for(k=(i+1);k<(j-1001);k++)
+              {
+//               fprintf(namef,"%d %d\n",ctg_offset[k],ctg_cover[k]);
+                 float cover_ave = 0.0; 
+		 if(wgs_depth == 0)
+		   cover_ave = 0.0;
+		 else
+		 {
+		   cover_ave = ctg_locnoi[k];
+		   cover_ave = cover_ave/wgs_depth;
+		 }
+                 fprintf(namef,"%d %f\n",ctg_offset[k],cover_ave);
               }
 	    }
 	    else if(denoise_flag == 2)
@@ -421,6 +477,10 @@ void Mapping_Process(char **argv,int args,int nSeq)
      fprintf(namef,"\n"); 
      fprintf(namef,"function plotcmd\n");
      fprintf(namef,"\{\n");
+     if(denoise_flag == 3)
+     {
+       fprintf(namef,"printf \"%s\\n\"\n",KKK10);
+     }
      fprintf(namef,"printf \"%s\\n\"\n",KKK1);
      fprintf(namef,"printf \"%s\\n\"\n",KKK2);
      fprintf(namef,"printf \"%s\\n\"\n",KKK3);

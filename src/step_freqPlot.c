@@ -53,7 +53,7 @@ static int n_type=0;
 static int barreads=5;
 static int file_flag=2;
 static int tiles_flag=0;
-static int denoise_flag=1;
+static int denoise_flag=3;
 static int y_hight=180;
 static int edge_flag=0;
 static int nContig=0;
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
     void Assemble_SM(int arr,int brr);
     void Mapping_Process(char **argv,int args,int nSeq);
     void Memory_Allocate(int arr);
-    char line[2000]={0},temp[60],cc[60],RC[5],readname[60],*st,*ed;
+    char line[2000]={0},temp[60],cc[60],RC[5],chrname[200],*st,*ed;
     char **cmatrix(long nrl,long nrh,long ncl,long nch);
 
     if(argc < 2)
@@ -190,8 +190,14 @@ int main(int argc, char **argv)
     }
 /*  read the alignment files         */
     i=0;
-    while(fscanf(namef,"%s %d %d",S_Name[i],&ctg_offset[i],&ctg_cover[i])!=EOF)
+    while(fscanf(namef,"%s %d %d",chrname,&ctg_offset[i],&ctg_cover[i])!=EOF)
     {
+        if((strncmp(chrname,"chr",3))==0)
+           strcpy(S_Name[i],chrname);
+        else
+        {
+           sprintf(S_Name[i],"%s%s","chr",chrname);
+        }
         i++;
     }
     fclose(namef);

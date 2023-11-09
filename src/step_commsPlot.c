@@ -52,8 +52,9 @@ static int IMOD=0;
 static int n_type=0;
 static int barreads=5;
 static int file_flag=2;
-static int denoise_flag=1;
+static int denoise_flag=3;
 static int y_hight=180;
+static int num_chr=23;
 static int block_set=5000;
 static int edge_flag=0;
 static int nContig=0;
@@ -88,7 +89,7 @@ int main(int argc, char **argv)
 
     if(argc < 2)
     {
-      printf("Usage: %s [-chr chr1] [-sample OES103] [-denoise 1] [-hight 180] <SAM_depth_file> <sh.coverplot>\n",argv[0]);
+      printf("Usage: %s [-chr chr1] [-sample OES103] [-denoise 1] [-hight 180] [-chrnum 23] <SAM_depth_file> <sh.coverplot>\n",argv[0]);
 
       exit(1);
     }
@@ -117,6 +118,11 @@ int main(int argc, char **argv)
          sscanf(argv[++i],"%d",&denoise_flag);
          args=args+2;
        }
+       else if(!strcmp(argv[i],"-chrnum"))
+       {
+         sscanf(argv[++i],"%d",&num_chr);
+         args=args+2;
+       }
        else if(!strcmp(argv[i],"-hight"))
        {
          sscanf(argv[++i],"%d",&y_hight);
@@ -135,7 +141,7 @@ int main(int argc, char **argv)
       printf("ERROR main:: args \n");
       exit(1);
     }
-    for(i=1;i<23;i++)
+    for(i=1;i<num_chr;i++)
     {
        memset(chromo,'\0',50);
        sprintf(chromo,"chr%d",i);

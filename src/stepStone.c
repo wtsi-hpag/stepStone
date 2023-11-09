@@ -67,8 +67,9 @@ static int min_len = 3000;
 static int bam_flag = 0;
 static int data_flag = 1;
 static int platform_tag = 1;
-static int denoise_flag = 1;
+static int denoise_flag = 3;
 static int y_hight = 180;
+static int num_chr = 23;
 static int n_cover = 5;
 
 void
@@ -213,6 +214,11 @@ int main(int argc, char **argv)
          sscanf(argv[++i],"%d",&window_size);
          args=args+2;
        }
+       else if(!strcmp(argv[i],"-chrnum"))
+       {
+         sscanf(argv[++i],"%d",&num_chr);
+         args=args+2;
+       }
        else if(!strcmp(argv[i],"-platform"))
        {
          run_align = 1;
@@ -345,7 +351,12 @@ int main(int argc, char **argv)
          printf("      		  -sample:   Sample name\n");
          printf("      		  -hight:    Maximum value in Y axis (read depth)\n");
          printf("      		  -window:   Window size to display chromosome coordinates\n");
-         printf("      		  -denoise:  Noise reduction option {0,1,2}\n");
+         printf("      		  -chrnum:   Number of chromosomes {23}\n");
+         printf("      		  -denoise:  Noise reduction option {0,1,2,3}\n");
+         printf("      		     (0) No noise reduction option\n");
+         printf("      		     (1) Average the data points after filtering high and low points within the window size\n");
+         printf("      		     (2) Fit the datasets into copy numbers after filtering/smoothing\n");
+         printf("      		     (3) Dimensionless copy numbers in logscale after filtering/smoothing\n");
          printf("\n");
          printf("===Without noise reduction:\n");
          printf("	Usage: %s plot -bam /myspace/desk/test-sorted.bam -sample cancer -denoise 0\n",argv[0]);
@@ -573,7 +584,7 @@ int main(int argc, char **argv)
         sprintf(commands,"%s/step_depthPlot",bindir);
 
         memset(syscmd,'\0',2000);
-        sprintf(syscmd,"%s/step_commsPlot -command %s -sample %s -denoise %d -hight %d sh.plots",bindir,commands,sample,denoise_flag,y_hight);
+        sprintf(syscmd,"%s/step_commsPlot -command %s -sample %s -denoise %d -hight %d -chrnum %d sh.plots",bindir,commands,sample,denoise_flag,y_hight,num_chr);
         RunSystemCommand(syscmd);
 
         memset(syscmd,'\0',2000);
@@ -589,7 +600,7 @@ int main(int argc, char **argv)
         sprintf(commands,"%s/step_freqPlot",bindir);
 
         memset(syscmd,'\0',2000);
-        sprintf(syscmd,"%s/step_commsPlot -command %s -sample %s sh.plot-freq",bindir,commands,sample);
+        sprintf(syscmd,"%s/step_commsPlot -command %s -sample %s -chrnum %d sh.plot-freq",bindir,commands,sample,num_chr);
         RunSystemCommand(syscmd);
 
         memset(syscmd,'\0',2000);
