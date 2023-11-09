@@ -83,9 +83,14 @@ Commands:                                               \
 	         -hight 180 -window 100 -denoise 1  					      	\	
 	      			 								\
 	      -sample:   Sample name		  						\
-	      -hight 	(180): 	Maximum value in Y axis (read depth)  					\
+	      -hight 	(180): 	Maximum value in Y axis (read depth)  				\
 	      -window 	(100): 	Window size to display chromosome coordinates  			\
-	      -denoise 	(1):  	Noise reduction option {0,1,2}  			 		\
+	      -chrnum 	(23):  	Number of chromosomes  			 		\
+	      -denoise 	(3):  	Noise reduction option {0,1,2,3}  			\
+	       	  (0)  	No noise reduction option  			 		\
+	       	  (1)  	Average the data points after filtering high and low points within the window size	\
+	       	  (2)  	Fit the datasets into copy numbers after filtering/smoothing	\
+	       	  (3)   Dimensionless copy numbers in logscale after filtering/smoothing\
 
 ===Without noise reduction:                                                                      \ 
 
