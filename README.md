@@ -105,8 +105,11 @@ Commands:                                               \
 
 ### Note:
 
-1. When you have high read coverage, or high level of aneuploidy, you need to adjust "hight";
-2. Window size gives you a chance to display the density of data points in plots.
+1. The pipeline only accepts correct chromosome names in the reference assembly, such as
+   >1,2,3,..., X,Y
+   >chr1,chr2,chr3, ..., chrX, chrY
+2. When you have high read coverage using -denoise {1,2}, you need to adjust "hight"; no need for -denoise 3.
+3. Window size gives you a chance to display the density of data points in plots.
 
 Please contact Zemin Ning ( zn1@sanger.ac.uk ) for any further information. 
 
