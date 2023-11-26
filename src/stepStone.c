@@ -423,9 +423,14 @@ int main(int argc, char **argv)
       memset(file_read2,'\0',2000);
       sprintf(file_read1,"%s/%s",tempa,fq1name);
       sprintf(file_read2,"%s/%s",tempa,fq2name);
-      sprintf(file_tarseq,"%s/%s",tempa,argv[args]);
       sprintf(file_bambam,"%s/%s",tempa,datname);
-      sprintf(file_Stones,"%s/%s",tempa,argv[args+1]);
+      if(bam_flag == 1)
+        sprintf(file_Stones,"%s/%s",tempa,argv[args]);
+      else
+      {
+        sprintf(file_tarseq,"%s/%s",tempa,argv[args]);
+        sprintf(file_Stones,"%s/%s",tempa,argv[args+1]);
+      }
       if((data_flag == 4)||(data_flag == 5))
       { 
         memset(syscmd,'\0',2000);
