@@ -174,12 +174,12 @@ int main(int argc, char **argv)
        else if(!strcmp(argv[i],"plot"))
        {
          flag_plot = 1;
-         args=args+2;
+         args=args+1;
        }
        else if(!strcmp(argv[i],"breakpoint"))
        {
          flag_breakpoint = 1;
-         args=args+2;
+         args=args+1;
        }
        else if(!strcmp(argv[i],"-data"))
        {
@@ -540,6 +540,7 @@ int main(int argc, char **argv)
       return EXIT_SUCCESS;
     }
 
+
     memset(file_tarseq,'\0',2000);
     memset(file_lgread,'\0',2000);
     memset(file_Stones,'\0',2000);
@@ -716,7 +717,9 @@ int main(int argc, char **argv)
     }
     else
     {
+      memset(file_Stones,'\0',2000);
       sprintf(file_Stones,"%s/%s",tempa,argv[args]);
+      printf("VCF file: %s %s\n",file_Stones,argv[args]);
     }
    
     if(run_align)
