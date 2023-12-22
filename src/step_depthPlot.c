@@ -45,7 +45,7 @@
 #define Max_N_NameBase 60 
 #define Max_N_Pair 100
 static char **S_Name,**R_Name,**R_Name2,**T_Name,**cellname;
-static int *hit_locus,*hit_index,*hit_score,*ctg_locnoi,*ctg_cover,*ctg_offset;
+static int *ctg_locus,*hit_index,*hit_score,*ctg_locnoi,*ctg_cover,*ctg_offset;
 
 /* SSAS default parameters   */
 static int IMOD=0;
@@ -166,6 +166,11 @@ int main(int argc, char **argv)
       printf("fmate: calloc - ctg_left\n");
       exit(1);
     }
+    if((ctg_locus = (int *)calloc(nseq,sizeof(int))) == NULL)
+    {
+      printf("fmate: calloc - ctg_left\n");
+      exit(1);
+    }
     if((ctg_locnoi = (int *)calloc(nseq,sizeof(int))) == NULL)
     {
       printf("fmate: calloc - ctg_left\n");
@@ -211,23 +216,45 @@ int main(int argc, char **argv)
 void Mapping_Process(char **argv,int args,int nSeq)
 /* =============================== */
 {
-     int i,j,k,m,n,n_chr,n_oando;
+     int i,j,k,kkk,m,n_chr,n_oando,win_size,step_n;
      int num_hits,num_pairs,wgs_depth,num_trans,num_sends,num_reads;
      int stopflag,*chr_trans,*chr_rdhit,*chr_inchr;
      int offset,offset1,offset2,block_len,block_ttt,de_noise[1001],de_index[1001];
      long int wgs_all;
-     float rate1,rate2,rate3;
-     FILE *namef;
-     int de_max,de_min,id_max,id_min,sum_locs;
+     float pca_sumx,pca_sumy,xdeg,*pca_x,*pca_y;
+     FILE *namef,*namef2;
+     int de_max,de_min,id_max,id_min,sum_locs,*pca_locus,*pca_index;
      void ArraySort_Mix(int n, long *arr, int *brr);
-     char **DBname,RC[2],outputname[100];
+     char **DBname,RC[2],outputname[100],outpcaname[100];
      void ArraySort_Int2(int n, int *arr, int *brr);
+     void ArraySort_Float2(int n, float *arr, int *brr);
      char **cmatrix(long nrl,long nrh,long ncl,long nch);
      void ArraySort_String(int n,char **Pair_Name,int *brr);
      char KKK1[100],KKK10[100],KKK2[100],KKK3[100],KKK4[100],KKK5[100],KKK6[100],KKK7[100];
      char *st,*ed,Sam_name[30],syscmd[2000],Chr_name[30];
 
      n_oando = 1;
+
+     if((pca_index = (int *)calloc(10000,sizeof(int))) == NULL)
+     {
+       printf("fmate: calloc - ctg_left\n");
+       exit(1);
+     }
+     if((pca_locus = (int *)calloc(10000,sizeof(int))) == NULL)
+     {
+       printf("fmate: calloc - ctg_left\n");
+       exit(1);
+     }
+     if((pca_x = (float *)calloc(10000,sizeof(float))) == NULL)
+     {
+       printf("fmate: calloc - ctg_left\n");
+       exit(1);
+     }
+     if((pca_y = (float *)calloc(10000,sizeof(float))) == NULL)
+     {
+       printf("fmate: calloc - ctg_left\n");
+       exit(1);
+     }
 
      if(denoise_flag == 3)
      {
@@ -247,7 +274,7 @@ void Mapping_Process(char **argv,int args,int nSeq)
      strcpy(KKK5,"plot [ 1 to");
 //     strcpy(KKK7,"[ 1 to 150 ] ");
      if(denoise_flag == 3)
-       strcpy(KKK7,"[ 0.1 to 10.0 ] ");
+       strcpy(KKK7,"[ 0.6 to 6.0 ] ");
      else
        sprintf(KKK7,"%s%d%s","[ 1 to ",y_hight," ] ");
 //     strcpy(KKK7,"[ 1 to 300 ] ");
@@ -262,7 +289,13 @@ void Mapping_Process(char **argv,int args,int nSeq)
      strcpy(Chr_name,chromo);
 
      sprintf(outputname,"%s.dat",chromo);
+     sprintf(outpcaname,"%s.pca",chromo);
      if((namef = fopen(outputname,"w")) == NULL)
+     {
+       printf("ERROR main:: args \n");
+       exit(1);
+     }
+     if((namef2 = fopen(outpcaname,"w")) == NULL)
      {
        printf("ERROR main:: args \n");
        exit(1);
@@ -302,11 +335,18 @@ void Mapping_Process(char **argv,int args,int nSeq)
         if((num_hits > 20)) 
         {
             G_Size = 0;
+	    win_size = 0;
             for(k=(i+1);k<j;k++)
             {
                if(ctg_offset[k] > G_Size)
                  G_Size = ctg_offset[k];
             }
+	    win_size = G_Size/num_hits;
+	    win_size = win_size/10;
+	    win_size = win_size*10;
+	    step_n = num_hits/9000;
+	    kkk = 0;
+	    xdeg = 3.14159/180;
 	    if(denoise_flag == 0)
 	    {
 	      for(k=(i+1);k<j;k++)
@@ -347,6 +387,7 @@ void Mapping_Process(char **argv,int args,int nSeq)
 	    {
 	      for(k=(i+1);k<(j-1001);k++)
               {
+                 float cover_ave = 0.0; 
                  memset(de_noise,'\0',4004);
                  memset(de_index,'\0',4004);
                  de_max = 0;
@@ -364,7 +405,39 @@ void Mapping_Process(char **argv,int args,int nSeq)
                  {
                     sum_locs = de_noise[m]+sum_locs;
                  }
-                 ctg_locnoi[k] = sum_locs/200;
+		 if(wgs_depth == 0)
+		   cover_ave = 0.0;
+		 else
+		 {
+		   cover_ave = sum_locs/200;
+		   cover_ave = cover_ave/wgs_depth;
+		 }
+		 if(cover_ave < 6.0)
+                   ctg_locus[k] = sum_locs/200;
+		 else 
+                   ctg_locus[k] = 2*wgs_depth;
+              }
+
+	      for(k=(i+1);k<(j-1001);k++)
+              {
+                 memset(de_noise,'\0',4004);
+                 memset(de_index,'\0',4004);
+                 de_max = 0;
+                 de_min = 999999999;
+                 id_max = 0;
+                 id_min = 0;
+                 sum_locs = 0;
+                 for(m=0;m<1000;m++)
+                 {
+                    de_noise[m] = ctg_locus[k+m];
+                    de_index[m] = m;
+                 }
+                 ArraySort_Int2(1000,de_noise,de_index);
+                 for(m=450;m<550;m++)
+                 {
+                    sum_locs = de_noise[m]+sum_locs;
+                 }
+                 ctg_locnoi[k] = sum_locs/100;
               }
 
               for(k=(i+1);k<(j-1001);k++)
@@ -379,7 +452,51 @@ void Mapping_Process(char **argv,int args,int nSeq)
 		   cover_ave = cover_ave/wgs_depth;
 		 }
                  fprintf(namef,"%d %f\n",ctg_offset[k],cover_ave);
+		 if(((k-i)%step_n==0)&&(kkk<9000))
+		 {
+		   kkk++;
+		   xdeg = 3.14159/180;
+		   xdeg = xdeg*kkk;
+		   xdeg = xdeg/100;
+//		   pca_x[kkk-1] = cover_ave*cos(xdeg);
+//		   pca_y[kkk-1] = cover_ave*sin(xdeg);
+		   pca_x[kkk-1] = cover_ave;
+		   pca_locus[kkk-1] = ctg_offset[k];
+//		   pca_y[kkk-1] = (2.0*wgs_depth)-cover_ave;
+//                   printf("PCA: %s %d %d %f %f %d %f || %f %f\n",chromo,k-i,kkk,xdeg,sin(xdeg),ctg_offset[k],cover_ave,cover_ave*sin(xdeg),cover_ave*cos(xdeg));
+		 }
               }
+/*	      for(k=0;k<9000;k++)
+	      {
+		 if(pca_x[k] < 7.0)
+		   pca_xx[k] = pca_x[k]*1000;
+		 else
+		   pca_xx[k] = 2000;
+		 pca_index[k] = k;
+	      }   */
+	      pca_sumx = 0;
+	      pca_sumy = 0;
+	      for(k=0;k<9000;k++)
+	      {
+		 if(pca_x[k] < 7.0)
+		   pca_sumx = pca_sumx + pca_x[k];
+//		 pca_sumy = pca_sumy + pca_y[k]*pca_y[k];
+	      }
+	      pca_sumx = pca_sumx/9000;
+	      for(k=0;k<9000;k++)
+              {
+		 pca_y[k] = (pca_x[k]-1.9)*(pca_x[k]-1.9);
+//		 pca_y[k] = (pca_x[k]-pca_sumx)*(pca_x[k]-pca_sumx);
+//		 pca_y[k] = sqrt(pca_y[k]);
+		 if(pca_y[k] < 1.0)
+                   pca_sumy = pca_sumy + pca_y[k];
+              }
+	      pca_sumy = pca_sumy/9000;
+	      pca_sumy = sqrt(pca_sumy);
+              fprintf(namef2,"PCA: %s %s %f %f\n",Sam_name,chromo,pca_sumx,pca_sumy);
+              printf("PCA: %s %s %f %f\n",Sam_name,chromo,pca_sumx,pca_sumy);
+//	      for(k=0;k<9000;k++)
+//                 printf("CO: %d %d %f %f %f\n",k,pca_locus[k],pca_sumx,pca_x[k],pca_y[k]);
 	    }
 	    else if(denoise_flag == 2)
 	    {
@@ -464,6 +581,7 @@ void Mapping_Process(char **argv,int args,int nSeq)
         i=j-1;
      }
      fclose(namef);
+     fclose(namef2);
 
 //     G_Size = 250000000;
      printf("Max: %d \n",G_Size);
@@ -866,6 +984,101 @@ void ArraySort_Int2(int n, int *arr, int *brr)
      }
 }
 
+/* =============================== */
+void ArraySort_Float2(int n, float *arr, int *brr)
+/* =============================== */
+{
+     int i,ir=n-1,j,k,m=0,jstack=0,b,NSTACK=50,istack[NSTACK];
+     int MIN=7;
+     float a,temp;
+
+     for(;;)
+     {
+/*      Insertion sort when subarray is small enough    */
+        if(ir-m<MIN)
+        {
+          for(j=m+1;j<=ir;j++)
+          {
+             a=arr[j];
+             b=brr[j];
+             for(i=j-1;i>=m;i--)
+             {
+                if(arr[i]<=a) break;
+                arr[i+1]=arr[i];
+                brr[i+1]=brr[i];
+             }
+             arr[i+1]=a;
+             brr[i+1]=b;
+          }
+          if(!jstack) return;
+          ir=istack[jstack--];
+          m=istack[jstack--];
+        }
+        else
+        {
+          k=(m+ir)>>1;
+          SWAP(arr[k],arr[m+1]);
+          SWAP(brr[k],brr[m+1]);
+
+          if(arr[m]>arr[ir])
+          {
+            SWAP(arr[m],arr[ir]);
+            SWAP(brr[m],brr[ir]);
+          }
+
+          if(arr[m+1]>arr[ir])
+          {
+            SWAP(arr[m+1],arr[ir]);
+            SWAP(brr[m+1],brr[ir]);
+          }
+
+          if(arr[m]>arr[m+1])
+          {
+            SWAP(arr[m],arr[m+1]);
+            SWAP(brr[m],brr[m+1]);
+          }
+
+          i=m+1;
+          j=ir;
+          a=arr[m+1];
+          b=brr[m+1];
+          for(;;)
+          {
+             do i++; while (arr[i]<a);
+             do j--; while (arr[j]>a);
+             if(j<i) break;
+             SWAP(arr[i],arr[j]);
+             SWAP(brr[i],brr[j]);
+          }
+          arr[m+1]=arr[j];
+          arr[j]=a;
+          brr[m+1]=brr[j];
+          brr[j]=b;
+          jstack+=2;
+
+/*        Push pointers to larger subarray on stack      */
+/*        process smaller subarray immediately           */
+          if(jstack>NSTACK)
+          {
+             printf("Stack error: NSTACK too small\n");
+             exit(0);
+          }
+          if(ir-i+1>=j-m)
+          {
+            istack[jstack]=ir;
+            istack[jstack-1]=i;
+            ir=j-1;
+          }
+          else
+          {
+            istack[jstack]=j-1;
+            istack[jstack-1]=m;
+            m=i;
+          }
+        }
+     }
+}
+
 /*   function to sort an array into a decreasing order:  a>b>c>....    */  
 /* =============================== */
 void ArraySort2_Int2(int n, int *arr, int *brr)
@@ -1078,7 +1291,6 @@ void s_swap(char **Pair_Name, int i, int j)
      strcpy(Pair_Name[i],Pair_Name[j]);
      strcpy(Pair_Name[j],temp);
 }
-
 
 /*   to sort the string array in order          */
 /* ============================================= */
